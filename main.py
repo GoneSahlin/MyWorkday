@@ -114,24 +114,45 @@ def wait_for_next_page(driver: webdriver.Firefox):
 
 
 def info_page(driver: webdriver.Firefox):
-    fills = {}
-    fills["legalNameSection_firstName"] = "Zach"
-    fills["legalNameSection_lastName"] = "Sahlin"
-    fills["addressSection_addressLine1"] = "5034 46th Ave NE"
-    fills["addressSection_city"] = "Seattle"
-    fills["addressSection_postalCode"] = "98105"
-    fills["email"] = "zach@sahlins.net"
-    fills["phone-number"] = "2066077655"
+    try:
+        fills = {}
+        fills["legalNameSection_firstName"] = "Zachary"
+        fills["legalNameSection_lastName"] = "Sahlin"
+        fills["addressSection_addressLine1"] = "5034 46th Ave NE"
+        fills["addressSection_city"] = "Seattle"
+        fills["addressSection_postalCode"] = "98105"
+        fills["email"] = "zach@sahlins.net"
+        fills["phone-number"] = "2066077655"
 
-    for key in fills.keys():
-        fill_input(driver, key, fills[key])
+        for key in fills.keys():
+            fill_input(driver, key, fills[key])
+
+        # preferred name
+        try:
+            xpath = "//input[@data-automation-id='preferredNameCheckbox']"
+            # xpath =  "//*[ contains (text(),  'I have a preferred name') ]"
+            element = driver.find_element(By.XPATH, xpath)
+
+            # click on element
+            driver.execute_script("arguments[0].scrollIntoView();", element)
+            driver.execute_script("window.scrollBy(0, -300);")
+            element.click()
+
+            fill_input(driver, "preferredNameSection_firstName", "Zach")
+            fill_input(driver, "preferredNameSection_lastName", "Sahlin")
+        except Exception as e:
+            print(e)
+            
     
-    dropdowns = {}
-    dropdowns["addressSection_countryRegion"] = "Washington"
-    dropdowns["phone-device-type"] = "Mobile"
+        dropdowns = {}
+        dropdowns["addressSection_countryRegion"] = "Washington"
+        dropdowns["phone-device-type"] = "Mobile"
 
-    for key in dropdowns.keys():
-        select_dropdown(driver, key, dropdowns[key])
+        for key in dropdowns.keys():
+            select_dropdown(driver, key, dropdowns[key])
+            
+    except:
+        print("Failed to fill out info page")
 
 
 def click_add_button(driver: webdriver.Firefox, aria_label):
@@ -139,8 +160,12 @@ def click_add_button(driver: webdriver.Firefox, aria_label):
         xpath = "//button[@aria-label='" + aria_label + "']"    
         element = driver.find_element(By.XPATH, xpath)
     except:
-        print(f"Failed to find add button {aria_label}")
-        return
+        try:
+            xpath = "//button[@aria-label='" + aria_label + " (Optional)']"
+            element = driver.find_element(By.XPATH, xpath)
+        except:
+            print(f"Failed to find add button {aria_label}")
+            return
 
     driver.execute_script("arguments[0].scrollIntoView();", element)
     driver.execute_script("window.scrollBy(0, -300);")
@@ -160,45 +185,51 @@ def enter_dates(driver: webdriver.Firefox, id, start_date_str, end_date_str):
 
 
 def work_experience_1(driver: webdriver.Firefox):
-    # first work experience
     try:
-        click_add_button(driver, "Add Work Experience")
+        # first work experience
+        try:
+            click_add_button(driver, "Add Work Experience")
+        except:
+            print("Failed to add work experience")
+
+        fills = {}
+        fills["jobTitle"] = "Teaching Assistant"
+        fills["company"] = "Gonzaga University"
+        fills["location"] = "Spokane, WA"
+
+        for key in fills.keys():
+            fill_input(driver, key, fills[key])
+
+        enter_dates(driver, "dateSectionMonth-display", "082022", "052023")
+
+        description = "- Teaching assistant for Operating Systems, Computer Security, and Internet of Things.\n- Graded programming and written assignments."
+        fill_input(driver, "description", description, element_type="textarea")
     except:
-        print("Failed to add work experience")
-
-    fills = {}
-    fills["jobTitle"] = "Teaching Assistant"
-    fills["company"] = "Gonzaga University"
-    fills["location"] = "Spokane, WA"
-
-    for key in fills.keys():
-        fill_input(driver, key, fills[key])
-
-    enter_dates(driver, "dateSectionMonth-display", "082022", "052023")
-
-    description = "- Teaching assistant for Operating Systems, Computer Security, and Internet of Things.\n- Graded programming and written assignments."
-    fill_input(driver, "description", description, element_type="textarea")
+        print("Failed to fill out work experience 1")
 
     
 def work_experience_2(driver: webdriver.Firefox):
-    # second work experience
     try:
-        click_add_button(driver, "Add Another Work Experience")
+        # second work experience
+        try:
+            click_add_button(driver, "Add Another Work Experience")
+        except:
+            print("Failed to add work experience")
+
+        fills = {}
+        fills["jobTitle"] = "Online Private Instructor"
+        fills["company"] = "iD Tech"
+        fills["location"] = "Remote"
+
+        for key in fills.keys():
+            fill_input(driver, key, fills[key])
+
+        enter_dates(driver, "dateSectionMonth-display", "062021", "082022")
+
+        description = "- Tutored in 8 different computer science topics, including C++, Java, and Python.\n- Completed over 200 private lessons.\n- Formed relationships with long-term clients, and developed further skills in communication and coding.\n- Collaborated with other instructors to improve teaching methods."
+        fill_input(driver, "description", description, element_type="textarea")
     except:
-        print("Failed to add work experience")
-
-    fills = {}
-    fills["jobTitle"] = "Online Private Instructor"
-    fills["company"] = "iD Tech"
-    fills["location"] = "Remote"
-
-    for key in fills.keys():
-        fill_input(driver, key, fills[key])
-
-    enter_dates(driver, "dateSectionMonth-display", "062021", "082022")
-
-    description = "- Tutored in 8 different computer science topics, including C++, Java, and Python.\n- Completed over 200 private lessons.\n- Formed relationships with long-term clients, and developed further skills in communication and coding.\n- Collaborated with other instructors to improve teaching methods."
-    fill_input(driver, "description", description, element_type="textarea")
+        print("Failed to fill out work experience 2")
 
 
 def education(driver: webdriver.Firefox):
@@ -208,7 +239,7 @@ def education(driver: webdriver.Firefox):
 
     fills = {}
     fills["school"] = "Gonzaga University"
-    fills["gpa"] = "3.8"
+    fills["gpa"] = "3.7"
 
     for key in fills.keys():
         fill_input(driver, key, fills[key])
@@ -240,10 +271,10 @@ def experience_page(driver: webdriver.Firefox):
 
 
 def main():
-    # url = get_url()
+    url = get_url()
     # url = "https://blackrock.wd1.myworkdayjobs.com/en-US/BlackRock_Professional/job/Seattle-WA/Associate--Software-Engineer--Applications_R231920/apply/applyManually"
     # url = "https://disney.wd5.myworkdayjobs.com/en-US/disneycareer/job/Seattle-WA-USA/Associate-Software-Engineer--Seattle_10058251/apply/applyManually"
-    url = "https://vmware.wd1.myworkdayjobs.com/en-US/VMware/job/USA-California-Palo-Alto/Software-Engineer_R2304988/apply/applyManually"
+    # url = "https://vmware.wd1.myworkdayjobs.com/en-US/VMware/job/USA-California-Palo-Alto/Software-Engineer_R2304988/apply/applyManually"
 
     driver = open_driver()
     driver.get(url)
